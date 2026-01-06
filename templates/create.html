@@ -50,92 +50,59 @@
                             </div>
                             <div class="col-lg-12 col-xl-6">
                                 <div class="form-floating">
-
                                     <select name="product_category" class="form-select" id="category">
                                         <option value="">Select Category</option>
 
                                         <option value="Electronics" {% if
                                             request.form.get('product_category')=='Electronics' %}selected{% endif %}>
-                                            Electronics
-                                        </option>
-
+                                            Electronics</option>
                                         <option value="Stationery" {% if
                                             request.form.get('product_category')=='Stationery' %}selected{% endif %}>
-                                            Stationery
-                                        </option>
-
+                                            Stationery</option>
                                         <option value="Fashion" {% if request.form.get('product_category')=='Fashion'
-                                            %}selected{% endif %}>
-                                            Fashion
-                                        </option>
-
+                                            %}selected{% endif %}>Fashion</option>
                                         <option value="Laptops" {% if request.form.get('product_category')=='Laptops'
-                                            %}selected{% endif %}>
-                                            Laptops
-                                        </option>
-
+                                            %}selected{% endif %}>Laptops</option>
                                         <option value="Smartphones" {% if
                                             request.form.get('product_category')=='Smartphones' %}selected{% endif %}>
-                                            Smartphones
-                                        </option>
-
+                                            Smartphones</option>
                                         <option value="Clothings" {% if
                                             request.form.get('product_category')=='Clothings' %}selected{% endif %}>
-                                            Clothings
-                                        </option>
-
+                                            Clothings</option>
                                         <option value="Sports" {% if request.form.get('product_category')=='Sports'
-                                            %}selected{% endif %}>
-                                            Sports
-                                        </option>
-
+                                            %}selected{% endif %}>Sports</option>
                                         <option value="Entertainment" {% if
                                             request.form.get('product_category')=='Entertainment' %}selected{% endif %}>
-                                            Entertainment
-                                        </option>
-
+                                            Entertainment</option>
                                         <option value="Accessories" {% if
                                             request.form.get('product_category')=='Accessories' %}selected{% endif %}>
-                                            Accessories
-                                        </option>
-
+                                            Accessories</option>
                                         <option value="Gadgets" {% if request.form.get('product_category')=='Gadgets'
-                                            %}selected{% endif %}>
-                                            Gadgets
-                                        </option>
-
+                                            %}selected{% endif %}>Gadgets</option>
                                         <option value="Furniture" {% if
                                             request.form.get('product_category')=='Furniture' %}selected{% endif %}>
-                                            Furniture
-                                        </option>
-
+                                            Furniture</option>
                                         <option value="Other" {% if request.form.get('product_category')=='Other'
-                                            %}selected{% endif %}>
-                                            Other
-                                        </option>
+                                            %}selected{% endif %}>Other</option>
                                     </select>
-
-                                    <label for="phone">Product Category</label>
+                                    <label for="category">Product Category</label>
                                 </div>
                             </div>
+
                             <div class="col-lg-12 col-xl-6">
                                 <div class="form-floating">
-                                    <select name="product_brand" class="form-select" id="Product Condition">
-                                    <option value="">Product Condition</option>
+                                    <select name="product_brand" class="form-select" id="product_condition">
+                                        <option value="">Select Product Condition</option>
 
-                                        <option value="New" {% if
-                                            request.form.get('product_brand')=='New' %}selected{% endif %}>
-                                            New
-                                        </option>
-
+                                        <option value="New" {% if request.form.get('product_brand')=='New' %}selected{%
+                                            endif %}>New</option>
                                         <option value="Used" {% if request.form.get('product_brand')=='Used'
-                                            %}selected{% endif %}>
-                                            Used
-                                        </option>
+                                            %}selected{% endif %}>Used</option>
                                     </select>
-                                    <label for="project">Product Condition</label>
+                                    <label for="product_condition">Product Condition</label>
                                 </div>
                             </div>
+
                             <div class="col-12">
                                 <div class="form-floating">
                                     <input name="product_image" type="file" accept="image/*" class="form-select"
@@ -171,8 +138,8 @@
                             <div class="col-12">
                                 <div class="form-floating">
                                     <input name="product_description" class="form-control"
-                                        placeholder="Leave a message here" id="message" maxlength="300" style="height: 60px"
-                                        laceholder="Product Description"
+                                        placeholder="Leave a message here" id="message" maxlength="300"
+                                        style="height: 60px" laceholder="Product Description"
                                         value="{{ request.form.get('product_description', '') }}">
                                     <label for="message">Product Short Description (Maximum 300 Characters)</label>
                                 </div>
