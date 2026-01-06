@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Single Page Header start -->
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6 wow fadeInUp" data-wow-delay="0.1s">Shop</h1>
+    <ol class="breadcrumb justify-content-center mb-0 wow fadeInUp" data-wow-delay="0.3s">
+        <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('products') }}">Products</a></li>
+        <li class="breadcrumb-item active text-white">{{ product['product_name'] }}</li>
+    </ol>
+</div>
+<!-- Single Page Header End -->
+
+
+
+
+<!-- Single Products Start -->
+<div class="container-fluid shop py-5">
+    <div class="container py-5">
+        <div class="row g-4">
+
+            <div class="col-lg-12 col-xl-12 wow fadeInUp" data-wow-delay="0.1s">
+                <div class="row g-4 single-product">
+                    <div class="col-xl-6">
+                        <div class="single-carousel owl-carousel">
+                            <div class="single-item"
+                                data-dot="&lt;img class='img-fluid' src='{{ product['product_image'] }}' alt='Poster for {{ product['product_name'] }} ' /&gt;">
+                                <div class="single-inner bg-light rounded">
+                                    <img src="{{ product['product_image'] }}" class="img-fluid rounded"
+                                        alt="Poster for {{ product['product_name'] }}">
+                                </div>
+                            </div>
+                            <div class="single-item"
+                                data-dot="&lt;img class='img-fluid' src='{{ product['product_gallery1'] }}' alt=' Poster for {{ product['product_name'] }}' /&gt;">
+                                <div class="single-inner bg-light rounded">
+                                    <img src="{{ product['product_gallery1'] }}" class="img-fluid rounded"
+                                        alt="Poster for {{ product['product_name'] }}">
+                                </div>
+                            </div>
+                            <div class="single-item"
+                                data-dot="&lt;img class='img-fluid' src='{{ product['product_gallery2'] }}' alt=' Poster for {{ product['product_name'] }}' /&gt;">
+                                <div class="single-inner bg-light rounded">
+                                    <img src="{{ product['product_gallery2'] }}" class="img-fluid rounded"
+                                        alt="Poster for {{ product['product_name'] }}">
+                                </div>
+                            </div>
+                            <div class="single-item"
+                                data-dot="&lt;img class='img-fluid'  src='{{ product['product_gallery3'] }}' alt=' Poster for {{ product['product_name'] }}' /&gt;">
+                                <div class="single-inner bg-light rounded">
+                                    <img src="{{ product['product_gallery3'] }}" class="img-fluid rounded"
+                                        alt="Poster for {{ product['product_name'] }}">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="col-xl-6">
+                        <br>
+                        <h2 class="fw-bold mb-3">{{ product['product_name'] }}</h2>
+                        <h4 class="mb-3">Category: {{ product['product_category'] }}</h4>
+                        <h5 class="mb-3">Brand: {{ product['product_brand'] }}</h5>
+                        <h3 class="fw-bold mb-3">{{ product['product_price'] | gbp }}</h3>
+
+                        <p class="mb-4">{{ product['product_description'] }}</p>
+
+                        {% if session['user_id'] == product['user'] or is_admin() %}
+
+                        <div class="mb-3">
+                            <form method="post" action="{{ url_for('delete', id=product['id']) }}"
+                                onsubmit="return confirm('Are you sure you want to delete this product?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                <a href="{{ url_for('update', id=product['id']) }}">
+                                    <div class="btn btn-primary d-inline-block rounded text-white py-1 px-4 me-2"><i
+                                            class="fas fa-edit me-1"></i> Update</div>
+                                </a>
+                                <button type="submit"
+                                    class="btn btn-secondary d-inline-block rounded text-white py-1 px-4 ms-2"><i
+                                        class="fas fa-trash me-1"></i> Delete</button>
+
+                            </form>
+                        </div>
+                        {% endif %}
+
+                        {% if session['user_id'] %}
+                        <div class="mb-3">
+
+                            <a href="{{ url_for('create') }}">
+                                <div class="btn btn-primary d-inline-block rounded text-white py-1 px-4 me-2"><i
+                                        class="fas fa-plus me-1"></i> Add</div>
+                            </a>
+
+                            <a href="{{ url_for('products') }}">
+                                <div class="btn btn-primary d-inline-block rounded text-white py-1 px-4 me-2"><i
+                                        class="fas fa-arrow-left me-1"></i> Your products</div>
+                            </a>
+
+                        </div>
+                        {% endif %}
+                        <br> <br>
+
+                        <a href="{{ url_for('vendor_profile', user_id=product.user) }}"
+                            class="btn btn-primary border border-secondary rounded-pill px-4 py-2 mb-4 text-primary"><i
+                                class="fa fa-shopping-bag me-2 text-white"></i> Message Vendor</a>
+                    </div>
+                    
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- Single Products End -->
+
+<!-- Related Product Start -->
+<div class="container-fluid related-product">
+    <div class="container">
+        <div class="mx-auto text-center pb-5" style="max-width: 700px;">
+            <h4 class="text-primary mb-4 border-bottom border-primary border-2 d-inline-block p-2 title-border-radius wow fadeInUp"
+                data-wow-delay="0.1s">Related Products</h4>
+            <p class="wow fadeInUp" data-wow-delay="0.2s">Items similar to what you’re viewing. These Products might
+                match your interest</p>
+        </div>
+        <div class="related-carousel owl-carousel pt-4">
+
+            {% for item in related_products %}
+            <div class="related-item rounded">
+                <div class="related-item-inner border rounded">
+                    <div class="related-item-inner-item">
+                        <img src="{{ item['product_image'] }}" class="img-fluid w-100 rounded-top" alt="">
+                        {% if item['created'] | is_new %}
+                        <div class="related-new">New</div>
+                        {% endif %}
+                        <div class="related-details">
+                            <a href="{{ url_for('product', id=item['id']) }}"><i class="fa fa-eye fa-1x"></i></a>
+                        </div>
+                    </div>
+                    <div class="text-center rounded-bottom p-4">
+                        <a href="{{ url_for('product', id=item['id']) }}"
+                            class="d-block mb-2">{{item['product_category']}}</a>
+                        <a href="{{ url_for('product', id=item['id']) }}"
+                            class="d-block h4">{{item['product_name']}}</a>
+
+                        <span class="text-primary fs-5">{{ item['product_price'] | gbp }}</span>
+                    </div>
+                </div>
+                <div class="related-item-add border border-top-0 rounded-bottom  text-center p-4 pt-0">
+                    <br>
+                    <small class="d-block h6">Created by {{ item['user'] | get_username }} </small>
+                    <a href="{{ url_for('vendor_profile', user_id=product.user) }}" class="btn btn-primary border-secondary rounded-pill py-2 px-4 mb-4"><i
+                            class="fas fa-shopping-cart me-2"></i> Message Vendor</a>
+
+                </div>
+            </div>
+            {% else %}
+            <p class="text-muted">No related products available.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<!-- Related Product End -->
+
+
+{% endblock %}

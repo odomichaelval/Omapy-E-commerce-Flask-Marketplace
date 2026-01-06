@@ -7,7 +7,7 @@
     <ol class="breadcrumb justify-content-center mb-0 wow fadeInUp" data-wow-delay="0.3s">
         <li class="breadcrumb-item"><a href="#">Home</a></li>
         <li class="breadcrumb-item"><a href="#">Pages</a></li>
-        <li class="breadcrumb-item active text-white">ARegister at Omapy</li>
+        <li class="breadcrumb-item active text-white">Register at Omapy</li>
     </ol>
 </div>
 <!-- Single Page Header End -->
@@ -33,70 +33,145 @@
                     <h1 class="display-5 mb-4 wow fadeInUp" data-wow-delay="0.3s">Let's Get You Registered</h1>
                     <p class="mb-4 wow fadeInUp" data-wow-delay="0.5s">The contact form is currently inactive. Get a
                         functional and working contact form with Ajax & PHP in a few minutes. Just copy and paste
-                        the files, add a little code and you're done. <a
-                            href="https://htmlcodex.com/contact-form">Download Now</a>.</p>
-                    <form>
+                        the files, add a little code and you're done. <a href="{{ url_for('login') }}">Click to login if
+                            you already own an accout</a>. </p>
+
+                    <!-- Flash Messages: This will display any error/success/status messages to the user -->
+                    {% for category, message in get_flashed_messages(with_categories=True) %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+
+
+                    <form method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
                         <div class="row g-4 wow fadeInUp" data-wow-delay="0.1s">
+
+                            <!-- First Name -->
                             <div class="col-lg-12 col-xl-6">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="name" placeholder="Your Name">
-                                    <label for="name">Full Name</label>
+                                    <input name="first_name" type="text" class="form-control" id="first_name"
+                                        placeholder="First Name" value="{{ request.form.get('first_name', '') }}">
+                                    <label for="first_name">First Name</label>
                                 </div>
                             </div>
+
+                            <!-- Last Name -->
                             <div class="col-lg-12 col-xl-6">
                                 <div class="form-floating">
-                                    <input type="email" class="form-control" id="email" placeholder="Your Email">
+                                    <input name="last_name" type="text" class="form-control" id="last_name"
+                                        placeholder="Last Name" value="{{ request.form.get('last_name', '') }}">
+                                    <label for="last_name">Last Name</label>
+                                </div>
+                            </div>
+
+                            <!-- Username -->
+                            <div class="col-lg-12 col-xl-6">
+                                <div class="form-floating">
+                                    <input name="username" type="text" class="form-control" id="username"
+                                        placeholder="Username" value="{{ request.form.get('username', '') }}">
+                                    <label for="username">Username</label>
+                                </div>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="col-lg-12 col-xl-6">
+                                <div class="form-floating">
+                                    <input name="email" type="email" class="form-control" id="email"
+                                        placeholder="Your Email" value="{{ request.form.get('email', '') }}">
                                     <label for="email">Your Email</label>
                                 </div>
                             </div>
+
+                            <!-- Password -->
                             <div class="col-lg-12 col-xl-6">
                                 <div class="form-floating">
-                                    <input type="phone" class="form-control" id="phone" placeholder="Phone">
+                                    <input name="password" type="password" class="form-control" id="password"
+                                        placeholder="Password">
+                                    <label for="password">Password</label>
+                                </div>
+                            </div>
+
+                            <!-- Retype Password -->
+                            <div class="col-lg-12 col-xl-6">
+                                <div class="form-floating">
+                                    <input name="repassword" type="password" class="form-control" id="repassword"
+                                        placeholder="Retype Password">
+                                    <label for="repassword">Retype Password</label>
+                                </div>
+                            </div>
+
+                            <!-- Phone -->
+                            <div class="col-lg-12 col-xl-6">
+                                <div class="form-floating">
+                                    <input name="phone" type="tel" class="form-control" id="phone"
+                                        placeholder="0731234567" value="{{ request.form.get('phone', '') }}">
+                                        <small>Please make sure your phone number follows this pattern 0712345678</small>
                                     <label for="phone">Phone Number</label>
                                 </div>
                             </div>
+
+                            <!-- WhatsApp -->
                             <div class="col-lg-12 col-xl-6">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="project" placeholder="Project">
-                                    <label for="project">WhatsApp Number</label>
+                                    <input name="whatsapp" type="tel" class="form-control" id="whatsapp"
+                                        placeholder="+44731234567" value="{{ request.form.get('whatsapp', '') }}">
+                                        <small>Please make sure your whatsapp number follows this pattern +44712345678</small>
+                                    <label for="whatsapp">WhatsApp Number</label>
                                 </div>
                             </div>
-                            <div class="col-12 mt-0">
-                                <!--Picture file upload-->
-                                <div class="d-flex flex-sm-row align-items-center justify-content-center mt-3 gap-2">
-                                    <label for="poster">Picture</label>
-                                    <input name="poster" type="file" accept="image/*" class="form-select" id="poster"
-                                        placeholder="Picture" value="">
-                                </div>
-                            </div>
+
+                            <!-- Selfie Upload -->
                             <div class="col-12">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="subject" placeholder="Subject">
-                                    <label for="subject">House Address</label>
+                                    <input name="selfie" accept="image/*"  type="file" class="form-control" id="selfie" value="{{ request.form.get('selfie', '') }}">
+                                    <label for="selfie">Upload a Selfie</label>
                                 </div>
                             </div>
-                            <div class="col-lg-12 col-xl-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="project" placeholder="Project">
-                                    <label for="project">City</label>
-                                </div>
-                            </div>
-                            <div class="col-lg-12 col-xl-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="project" placeholder="Project">
-                                    <label for="project">Postcode</label>
-                                </div>
-                            </div>
+
+                            <!-- Address -->
                             <div class="col-12">
-                                <button class="btn btn-primary w-100 py-3">Register</button>
+                                <div class="form-floating">
+                                    <input name="address" type="text" class="form-control" id="address"
+                                        placeholder="House Address" value="{{ request.form.get('address', '') }}">
+                                    <label for="address">House Address</label>
+                                </div>
                             </div>
+
+                            <!-- City -->
+                            <div class="col-lg-12 col-xl-6">
+                                <div class="form-floating">
+                                    <input name="city" type="text" class="form-control" id="city" placeholder="City"
+                                        value="{{ request.form.get('city', '') }}">
+                                    <label for="city">City</label>
+                                </div>
+                            </div>
+
+                            <!-- Postcode -->
+                            <div class="col-lg-12 col-xl-6">
+                                <div class="form-floating">
+                                    <input name="postcode" type="text" class="form-control" id="postcode"
+                                        placeholder="Post Code" value="{{ request.form.get('postcode', '') }}">
+                                    <label for="postcode">Postcode</label>
+                                </div>
+                            </div>
+
+                            <!-- Submit -->
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary w-100 py-3">
+                                    Register
+                                </button>
+                            </div>
+
                         </div>
                     </form>
+
+
                 </div>
                 <div class="col-lg-5 wow fadeInUp" data-wow-delay="0.2s">
                     <div class="h-100 rounded">
                         <img src="{{ url_for('static', filename='img/Register8.webp') }}" class="rounded w-100"
-                            style="height: 100%;">
+                            style="height: 100%; object-fit: cover;">
 
                     </div>
                 </div>

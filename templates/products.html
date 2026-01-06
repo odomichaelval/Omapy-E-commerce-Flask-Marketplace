@@ -13,7 +13,10 @@
 <!-- Single Page Header End -->
 
 
-
+<!-- Flash Messages: This will display any error/success/status messages to the user -->
+                    {% for category, message in get_flashed_messages(with_categories=True) %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
 
 <!-- Our Products Start -->
 <div class="container-fluid product py-5">
@@ -26,11 +29,11 @@
                 <div class="col-lg-8 text-end wow fadeInRight" data-wow-delay="0.1s">
                     <ul class="nav nav-pills d-inline-flex text-center mb-5">
                         <li class="nav-item mb-4">
-
-                            <a class="d-flex mx-2 py-2 bg-light rounded-pill active" href="">
-                                <span class="text-dark" style="width: 130px;">All Products</span>
+                            {% if session['user_id'] == products_user %}
+                            <a class="d-flex mx-2 py-2 bg-light rounded-pill active" href="{{ url_for('create') }}">
+                                <span class="text-dark" style="width: 130px;">Add Products</span>
                             </a>
-
+                            {% endif %}
                         </li>
 
                     </ul>
@@ -46,8 +49,6 @@
                                     <div class="product-item-inner-item">
                                         <img src="{{ product['product_image'] }}" class="img-fluid w-100 rounded-top"
                                             alt="">
-
-
                                         {% if product['created'] | is_new %}
                                         <div class="product-new">New</div>
                                         {% endif %}
