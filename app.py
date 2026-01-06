@@ -67,14 +67,7 @@ def inject_categories():
         "categories": get_categories_with_count()
     }
 
-#filter for new products
-@app.template_filter()
-def is_new(created):
-    if not created:
-        return False
 
-    created_date = datetime.fromisoformat(created)
-    return created_date >= datetime.now() - timedelta(days=30)
 
 
 

@@ -48,9 +48,9 @@
                                             alt="">
 
 
-                                        {% if product['created'] | is_new %}
-                                        <div class="product-new">New</div>
-                                        {% endif %}
+                                        
+                                        <div class="product-new">{{product['product_brand']}}</div>
+                                       
                                         <div class="product-details">
                                             <a href="{{ url_for('product', id=product['id']) }}"><i
                                                     class="fa fa-eye fa-1x"></i></a>

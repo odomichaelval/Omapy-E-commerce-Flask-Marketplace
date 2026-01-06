@@ -120,9 +120,20 @@
                             </div>
                             <div class="col-lg-12 col-xl-6">
                                 <div class="form-floating">
-                                    <input name="product_brand" type="text" class="form-control" id="project"
-                                        placeholder="Product Brand" value="{{ request.form.get('product_brand', '') }}">
-                                    <label for="project">Product Brand</label>
+                                    <select name="product_brand" class="form-select" id="Product Condition">
+                                    <option value="">Product Condition</option>
+
+                                        <option value="New" {% if
+                                            request.form.get('product_brand')=='New' %}selected{% endif %}>
+                                            New
+                                        </option>
+
+                                        <option value="Used" {% if request.form.get('product_brand')=='Used'
+                                            %}selected{% endif %}>
+                                            Used
+                                        </option>
+                                    </select>
+                                    <label for="project">Product Condition</label>
                                 </div>
                             </div>
                             <div class="col-12">
