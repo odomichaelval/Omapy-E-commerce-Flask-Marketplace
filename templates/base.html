@@ -44,7 +44,7 @@
     <!-- Spinner End -->
 
 
-   
+
     <div class="container-fluid px-5 py-4 d-none d-lg-block">
         <div class="row gx-0 align-items-center text-center">
             <div class="col-md-4 col-lg-3 text-center text-lg-start">
@@ -61,7 +61,7 @@
                     <div class="d-flex border rounded-pill">
                         <input class="form-control border-0 rounded-pill w-100 py-3" type="text"
                             data-bs-target="#dropdownToggle123" placeholder="Search Looking For?">
-                      
+
                         <button type="button" class="btn btn-primary rounded-pill py-3 px-5" style="border: 0;"><i
                                 class="fas fa-search"></i></button>
                     </div>
@@ -69,7 +69,7 @@
             </div>
             <div class="col-md-4 col-lg-3 text-center text-lg-end">
                 <div class="d-inline-flex align-items-center">
-                 <b> Available only in England </b>
+                    <b> Available only in England </b>
                 </div>
             </div>
         </div>
@@ -88,36 +88,22 @@
                     <div class="collapse navbar-collapse rounded-bottom" id="allCat">
                         <div class="navbar-nav ms-auto py-0">
                             <ul class="list-unstyled categories-bars">
+
+                                {% for category in categories %}
                                 <li>
                                     <div class="categories-bars-item">
-                                        <a href="#">Accessories</a>
-                                        <span>(3)</span>
+                                        <a href="{{ url_for('category', category=category['product_category']) }}">
+                                            {{ category['product_category'] }}
+                                        </a>
+                                        <span>({{ category['total'] }})</span>
                                     </div>
                                 </li>
-                                <li>
-                                    <div class="categories-bars-item">
-                                        <a href="#">Electronics & Computer</a>
-                                        <span>(5)</span>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="categories-bars-item">
-                                        <a href="#">Laptops & Desktops</a>
-                                        <span>(2)</span>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="categories-bars-item">
-                                        <a href="#">Mobiles & Tablets</a>
-                                        <span>(8)</span>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="categories-bars-item">
-                                        <a href="#">SmartPhone & Smart TV</a>
-                                        <span>(5)</span>
-                                    </div>
-                                </li>
+                                {% endfor %}
+
+                                {% if categories|length == 0 %}
+                                <li class="text-muted px-3">No categories found</li>
+                                {% endif %}
+
                             </ul>
                         </div>
                     </div>
@@ -128,7 +114,7 @@
                     <a href="/" class="navbar-brand d-block d-lg-none">
                         <h1 class="display-5 text-secondary m-0"><i
                                 class="fas fa-shopping-bag text-white me-2"></i>Omapy</h1>
-                       
+
                     </a>
                     <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse"
                         data-bs-target="#navbarCollapse">
@@ -210,7 +196,7 @@
 
 
 
-  <!-- Footer Start -->
+    <!-- Footer Start -->
     <div class="container-fluid footer py-5 wow fadeIn" data-wow-delay="0.2s">
         <div class="container py-5">
             <div class="row g-4 rounded mb-5" style="background: rgba(255, 255, 255, .03);">

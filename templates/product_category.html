@@ -3,20 +3,17 @@
 {% block content %}
 <!-- Single Page Header start -->
 <div class="container-fluid page-header py-5">
-    <h1 class="text-center text-white display-6 wow fadeInUp" data-wow-delay="0.1s">Your Products</h1>
+    <h1 class="text-center text-white display-6 wow fadeInUp" data-wow-delay="0.1s">Category</h1>
     <ol class="breadcrumb justify-content-center mb-0 wow fadeInUp" data-wow-delay="0.3s">
         <li class="breadcrumb-item"><a href="/">Home</a></li>
-        
-        <li class="breadcrumb-item active text-white">Products created by {{username}}</li>
+       
+        <li class="breadcrumb-item active text-white">Product Category</li>
     </ol>
 </div>
 <!-- Single Page Header End -->
 
 
-<!-- Flash Messages: This will display any error/success/status messages to the user -->
-                    {% for category, message in get_flashed_messages(with_categories=True) %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
-                    {% endfor %}
+
 
 <!-- Our Products Start -->
 <div class="container-fluid product py-5">
@@ -29,11 +26,11 @@
                 <div class="col-lg-8 text-end wow fadeInRight" data-wow-delay="0.1s">
                     <ul class="nav nav-pills d-inline-flex text-center mb-5">
                         <li class="nav-item mb-4">
-                            {% if session['user_id'] == products_user %}
-                            <a class="d-flex mx-2 py-2 bg-light rounded-pill active" href="{{ url_for('create') }}">
-                                <span class="text-dark" style="width: 130px;">Add Products</span>
+
+                            <a class="d-flex mx-2 py-2 bg-light rounded-pill active" href="">
+                                <span class="text-dark" style="width: 130px;">All Products</span>
                             </a>
-                            {% endif %}
+
                         </li>
 
                     </ul>
@@ -49,6 +46,8 @@
                                     <div class="product-item-inner-item">
                                         <img src="{{ product['product_image'] }}" class="img-fluid w-100 rounded-top"
                                             alt="">
+
+
                                         {% if product['created'] | is_new %}
                                         <div class="product-new">New</div>
                                         {% endif %}

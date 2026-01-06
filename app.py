@@ -162,21 +162,27 @@ def contact():
    
  return render_template('contact.html', title="Contact Omapy")
 
+@app.route('/category/<string:category>/')
+def category(category):
 
-# Routing Create Product Page
-#@app.route('/create/', methods=('GET', 'POST'))
-#def create():
-   # If the request method is POST, process the form submission
-    #if request.method == 'POST':
+    products = get_products_by_category(category)
 
-        # Get the title input from the form
-        #product_name = request.form['product_name']
+    if not products:
+        flash('No products found in this category.', 'info')
 
-        # Validate the input
-        #if not product_name:
-            #flash(category='danger', message='Product Name is required!')
-            #return render_template('create.html')
+    return render_template('product_category.html',title=category,products=products,category=category)
 
+
+
+# Routing Category count in base.html
+@app.context_processor
+def inject_categories():
+    return {
+        "categories": get_categories_with_count()
+    }
+
+
+# Create Product
 @app.route('/create/', methods=['GET', 'POST'])
 def create():
 

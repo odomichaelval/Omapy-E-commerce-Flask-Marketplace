@@ -16,6 +16,8 @@ __all__ = [
     "create_product",
     "update_product",
     "delete_product",
+    "get_categories_with_count",
+    "get_products_by_category"
    
 ]
 
@@ -64,8 +66,7 @@ def get_user_by_id(user_id):
         abort(404)
     return user
 
-# Product Display functions
-# =========================================================
+
 
 
 # Product Display functions
@@ -117,20 +118,6 @@ def get_products_by_user(user=None, limit=None, order_by='product_name ASC'):
     return products
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Get a product by its ID
 def get_product_by_id(product_id):
     conn = get_db_connection()
@@ -175,6 +162,39 @@ def delete_product(product_id):
     conn.execute('DELETE FROM products WHERE id = ?', (product_id,))
     conn.commit()
     conn.close()
+
+# fetch and count catgories
+def get_categories_with_count():
+    conn = get_db_connection()
+    categories = conn.execute("""
+        SELECT product_category, COUNT(*) as total
+        FROM products
+        GROUP BY product_category
+        ORDER BY product_category ASC
+    """).fetchall()
+    conn.close()
+    return categories
+
+def get_products_by_category(category, limit=None, order_by='created DESC'):
+    conn = get_db_connection()
+
+    query = '''
+        SELECT *
+        FROM products
+        WHERE product_category = ?
+        ORDER BY {}
+    '''.format(order_by)
+
+    if limit:
+        query += ' LIMIT ?'
+        products = conn.execute(query, (category, limit)).fetchall()
+    else:
+        products = conn.execute(query, (category,)).fetchall()
+
+    conn.close()
+    return products
+
+
 
 
 
