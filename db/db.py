@@ -17,7 +17,8 @@ __all__ = [
     "update_product",
     "delete_product",
     "get_categories_with_count",
-    "get_products_by_category"
+    "get_products_by_category",
+    "search_products"
    
 ]
 
@@ -175,6 +176,8 @@ def get_categories_with_count():
     conn.close()
     return categories
 
+
+# fetch product category
 def get_products_by_category(category, limit=None, order_by='created DESC'):
     conn = get_db_connection()
 
@@ -193,6 +196,19 @@ def get_products_by_category(category, limit=None, order_by='created DESC'):
 
     conn.close()
     return products
+
+#search for product
+def search_products(keyword):
+    conn = get_db_connection()
+    products = conn.execute("""
+        SELECT *
+        FROM products
+        WHERE product_name LIKE ?
+        ORDER BY created DESC
+    """, (f"%{keyword}%",)).fetchall()
+    conn.close()
+    return products
+
 
 
 

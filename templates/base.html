@@ -58,13 +58,17 @@
             </div>
             <div class="col-md-4 col-lg-6 text-center">
                 <div class="position-relative ps-4">
-                    <div class="d-flex border rounded-pill">
-                        <input class="form-control border-0 rounded-pill w-100 py-3" type="text"
-                            data-bs-target="#dropdownToggle123" placeholder="Search Looking For?">
+                    <form method="get" action="{{ url_for('search_product') }}">
+                        <div class="d-flex border rounded-pill">
+                            <input class="form-control border-0 rounded-pill w-100 py-3" type="text" name="q"
+                                value="{{ request.args.get('q', '') }}" placeholder="Search Looking For?" required>
 
-                        <button type="button" class="btn btn-primary rounded-pill py-3 px-5" style="border: 0;"><i
-                                class="fas fa-search"></i></button>
-                    </div>
+                            <button type="submit" class="btn btn-primary rounded-pill py-3 px-5" style="border: 0;">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+
                 </div>
             </div>
             <div class="col-md-4 col-lg-3 text-center text-lg-end">

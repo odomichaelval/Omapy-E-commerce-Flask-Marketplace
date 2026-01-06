@@ -58,7 +58,14 @@ def gbp(value):
     except (ValueError, TypeError):
         return "£0.00"
     
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta 
+
+# Routing Category count in base.html
+@app.context_processor
+def inject_categories():
+    return {
+        "categories": get_categories_with_count()
+    }
 
 #filter for new products
 @app.template_filter()
@@ -162,6 +169,7 @@ def contact():
    
  return render_template('contact.html', title="Contact Omapy")
 
+#fetch product category
 @app.route('/category/<string:category>/')
 def category(category):
 
@@ -172,14 +180,27 @@ def category(category):
 
     return render_template('product_category.html',title=category,products=products,category=category)
 
+#fetch product search
+@app.route('/search_product/')
+def search_product():
+
+    query = request.args.get('q', '').strip()
+    products = []
+
+    if query:
+        products = search_products(query)
+
+    return render_template(
+        'search_product.html',
+        title=f"Search results for '{query}'" if query else "Search",
+        products=products,
+        query=query
+    )
 
 
-# Routing Category count in base.html
-@app.context_processor
-def inject_categories():
-    return {
-        "categories": get_categories_with_count()
-    }
+
+
+
 
 
 # Create Product
