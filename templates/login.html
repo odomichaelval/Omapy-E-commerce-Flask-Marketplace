@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Single Page Header start -->
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6 wow fadeInUp" data-wow-delay="0.1s">Login</h1>
+    <ol class="breadcrumb justify-content-center mb-0 wow fadeInUp" data-wow-delay="0.3s">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item active text-white">Login </li>
+    </ol>
+</div>
+<!-- Single Page Header End -->
+
+
+
+
+<!-- Contucts Start -->
+<div class="container-fluid contact py-5">
+    <div class="container py-5">
+        <div class="p-5 bg-light rounded">
+            <div class="row g-4">
+                <div class="col-12">
+                    <div class="text-center mx-auto wow fadeInUp" data-wow-delay="0.1s" style="max-width: 900px;">
+                        <h4 class="text-primary border-bottom border-primary border-2 d-inline-block pb-2">Get in
+                            touch</h4>
+                        <p class="mb-5 fs-5 text-dark">We are here for you! how can we help.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <h5 class="text-primary wow fadeInUp" data-wow-delay="0.1s">Let’s Connect</h5>
+                    <h1 class="display-5 mb-4 wow fadeInUp" data-wow-delay="0.3s">Log In Here</h1>
+                    <p class="mb-4 wow fadeInUp" data-wow-delay="0.5s"> <a href="{{ url_for('register') }}"> Don't have an
+                            account? Click to Register</a>.</p>
+                    
+                     <!-- Flash Messages: This will display any error/success/status messages to the user -->
+                    {% for category, message in get_flashed_messages(with_categories=True) %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+
+                    <form method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+                        <div class="row g-4 wow fadeInUp" data-wow-delay="0.1s">
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input name="username" type="text" class="form-control" id="username"
+                                        placeholder="Username" value="{{ request.form['username'] }}">
+                                    <label for="Username">Username</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input name="password" type="password" class="form-control" id="Password"
+                                        placeholder="Password">
+                                    <label for="Password">Password</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary w-100 py-3">Login</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-lg-5 wow fadeInUp" data-wow-delay="0.2s">
+                    <div class="h-100 rounded">
+                        <img src="{{ url_for('static', filename='img/Register8.webp') }}" class="rounded w-100"
+                            style="height: 100%; object-fit: cover;" alt="Map Image">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Contuct End -->
+
+
+
+
+
+
+
+
+
+
+
+{% endblock %}
