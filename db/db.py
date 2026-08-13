@@ -142,18 +142,18 @@ def get_related_products(category, current_product_id, limit=6):
     return products
 
 # Create a new product
-def create_product(user_id, product_name, product_price, product_category, product_brand, product_description, product_image, product_gallery1, product_gallery2, product_gallery3):
+def create_product(user_id, product_name, product_price, product_category, product_condition, product_description, product_image, product_gallery1, product_gallery2, product_gallery3):
     conn = get_db_connection()
-    conn.execute("INSERT INTO products (user, product_name, product_price, product_category,  product_brand, product_description, product_image, product_gallery1, product_gallery2, product_gallery3 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                (user_id, product_name, product_price, product_category, product_brand, product_description, product_image, product_gallery1, product_gallery2, product_gallery3)
+    conn.execute("INSERT INTO products (user, product_name, product_price, product_category,  product_condition, product_description, product_image, product_gallery1, product_gallery2, product_gallery3 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (user_id, product_name, product_price, product_category, product_condition, product_description, product_image, product_gallery1, product_gallery2, product_gallery3)
                 )
     conn.commit()
 
 # Update a product by its ID
-def update_product(product_id, product_name, product_price, product_category, product_brand, product_description, product_image, product_gallery1, product_gallery2, product_gallery3):
+def update_product(product_id, product_name, product_price, product_category, product_condition, product_description, product_image, product_gallery1, product_gallery2, product_gallery3):
     conn = get_db_connection()
-    conn.execute('UPDATE products SET product_name = ?, product_price = ?, product_category = ?, product_brand = ?, product_description = ?, product_image = ?, product_gallery1 = ?, product_gallery2 = ?, product_gallery3 = ? WHERE id = ?',
-                 (product_name, product_price, product_category, product_brand, product_description, product_image, product_gallery1, product_gallery2, product_gallery3,product_id))
+    conn.execute('UPDATE products SET product_name = ?, product_price = ?, product_category = ?, product_condition = ?, product_description = ?, product_image = ?, product_gallery1 = ?, product_gallery2 = ?, product_gallery3 = ? WHERE id = ?',
+                 (product_name, product_price, product_category, product_condition, product_description, product_image, product_gallery1, product_gallery2, product_gallery3,product_id))
     conn.commit()
     conn.close()
 

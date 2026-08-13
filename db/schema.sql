@@ -26,7 +26,7 @@ CREATE TABLE products (
     product_name TEXT NOT NULL,
     product_price INTEGER NOT NULL,
     product_category TEXT,
-    product_brand TEXT,
+    product_condition TEXT,
     product_description TEXT,
     product_image TEXT,
     product_gallery1 TEXT,

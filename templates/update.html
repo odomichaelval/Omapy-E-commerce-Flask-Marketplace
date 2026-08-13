@@ -89,23 +89,23 @@
                             </div>
                             <div class="col-lg-12 col-xl-6">
                                 <div class="form-floating">
-                                    <select name="product_brand" class="form-select" id="product_brand">
+                                    <select name="product_condition" class="form-select" id="product_condition">
 
-                                        <option value="" {% if product['product_brand']=="" %}selected{% endif %}>
+                                        <option value="" {% if product['product_condition']=="" %}selected{% endif %}>
                                             Select Product Condition
                                         </option>
 
-                                        <option value="New" {% if product['product_brand']=="New" %}selected{% endif %}>
+                                        <option value="New" {% if product['product_condition']=="New" %}selected{% endif %}>
                                             New
                                         </option>
 
-                                        <option value="Used" {% if product['product_brand']=="Used" %}selected{% endif
+                                        <option value="Used" {% if product['product_condition']=="Used" %}selected{% endif
                                             %}>
                                             Used
                                         </option>
 
                                     </select>
-                                    <label for="product_brand">Product Condition</label>
+                                    <label for="product_condition">Product Condition</label>
                                 </div>
                             </div>
 

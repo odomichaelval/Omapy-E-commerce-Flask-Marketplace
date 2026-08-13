@@ -60,7 +60,7 @@
                         <br>
                         <h2 class="fw-bold mb-3">{{ product['product_name'] }}</h2>
                         <h4 class="mb-3">Category: {{ product['product_category'] }}</h4>
-                        <h5 class="mb-3">Condition: {{ product['product_brand'] }}</h5>
+                        <h5 class="mb-3">Condition: {{ product['product_condition'] }}</h5>
                         <h3 class="fw-bold mb-3">{{ product['product_price'] | gbp }}</h3>
 
                         <p class="mb-4">{{ product['product_description'] }}</p>
@@ -130,7 +130,7 @@
                     <div class="related-item-inner-item">
                         <img src="{{ item['product_image'] }}" class="img-fluid w-100 rounded-top" alt="product image">
                         
-                        <div class="related-new">{{item['product_brand']}}</div>
+                        <div class="related-new">{{item['product_condition']}}</div>
                         
                         <div class="related-details">
                             <a href="{{ url_for('product', id=item['id']) }}"><i class="fa fa-eye fa-1x"></i></a>

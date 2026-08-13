@@ -1,4 +1,5 @@
 
+
 /*** Spinner Start ***/
 /*** Spinner ***/
 #spinner {
@@ -867,3 +868,48 @@
     background: var(--bs-primary) !important;
 }
 /*** copyright end ***/
+
+/* AI suggestion buttons */
+.ai-suggest-btn {
+  background-color: transparent;
+  border: 1px solid #F28B00;
+  color: #000000;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.ai-suggest-btn:hover,
+.ai-suggest-btn:focus {
+  background-color: #F28B00;
+  color: #ffffff;
+  border-color: #F28B00;
+}
+
+.ai-suggestion-box {
+  margin-top: 6px;
+}
+
+/* Search result match badges */
+.product-match-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 3px 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: 4px;
+  z-index: 2;
+}
+
+.product-match-badge.exact-match {
+  background-color: #333;
+  color: #fff;
+}
+
+.product-match-badge.ai-match {
+  background-color: #F28B00;
+  color: #fff;
+}

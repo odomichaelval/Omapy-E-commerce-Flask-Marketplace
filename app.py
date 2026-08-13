@@ -2,6 +2,7 @@
 from flask import Flask, render_template, url_for, request, flash, redirect, session
 from flask_wtf import CSRFProtect
 from flask_wtf.csrf import generate_csrf
+from ai.predict import suggest_category, suggest_price, get_similar_products, semantic_search
 
 
 from db.db import *
@@ -136,14 +137,15 @@ def userProducts(user_id):
 def product(id):
 
     # Get product data
-    product_data = get_product_by_id(id)  
+    product_data = get_product_by_id(id)
 
     if not product_data:
          flash(category='warning', message='Requested product not found!')
          return redirect(url_for('/'))
-    
-     # Get related products (same category)
-    related_products = get_related_products( product_data['product_category'],product_data['id'])
+
+    # AI-powered related products (clustering-based, falls back to category)
+    similar_ids = get_similar_products(id, product_data['product_category'])
+    related_products = [get_product_by_id(pid) for pid in similar_ids]
 
     return render_template('product.html', title=product_data['product_name'], product=product_data, related_products=related_products)
    
@@ -173,22 +175,7 @@ def category(category):
 
     return render_template('product_category.html',title=category,products=products,category=category)
 
-#fetch product search
-@app.route('/search_product/')
-def search_product():
 
-    query = request.args.get('q', '').strip()
-    products = []
-
-    if query:
-        products = search_products(query)
-
-    return render_template(
-        'search_product.html',
-        title=f"Search results for '{query}'" if query else "Search",
-        products=products,
-        query=query
-    )
 
 
 
@@ -212,7 +199,7 @@ def create():
         product_name = request.form['product_name']
         product_price = request.form['product_price']
         product_category = request.form['product_category']
-        product_brand = request.form['product_brand']
+        product_condition = request.form['product_condition']
         product_description = request.form['product_description']
         
                 # Handle product_image upload
@@ -269,10 +256,10 @@ def create():
             error = 'Product Price is required!'
         elif not product_category:
              error = 'Product Category is required!'
-        elif not product_brand:
-            error = 'Product Price is required!'
+        elif not product_condition:
+            error = 'Product Condition is required!'
         elif not product_description:
-             error = 'Product Category is required!'
+             error = 'Product Description is required!'
         elif not product_image:
             error = 'Product Image is required!'
         elif not product_gallery1:
@@ -293,7 +280,7 @@ def create():
     
           # [TO-DO]: Add real creation logic here (e.g. save to database record)
 
-        create_product(user,  product_name, product_price, product_category,  product_brand, product_description, product_image, product_gallery1, product_gallery2, product_gallery3)
+        create_product(user,  product_name, product_price, product_category,  product_condition, product_description, product_image, product_gallery1, product_gallery2, product_gallery3)
        # create_product(new_product)
         # ===========================
 
@@ -333,7 +320,7 @@ def update(id):
         product_name = request.form['product_name']
         product_price = request.form['product_price']
         product_category = request.form['product_category']
-        product_brand = request.form['product_brand']
+        product_condition = request.form['product_condition']
         product_description = request.form['product_description']
 
                 # Handle product image upload
@@ -389,10 +376,10 @@ def update(id):
             error = 'Product Price is required!'
         elif not product_category:
              error = 'Product Category is required!'
-        elif not product_brand:
-            error = 'Product Price is required!'
+        elif not product_condition:
+            error = 'Product Condition is required!'
         elif not product_description:
-             error = 'Product Category is required!'
+             error = 'Product Description is required!'
         elif not product_image:
             error = 'Product Image is required!'
         elif not product_gallery1:
@@ -413,7 +400,7 @@ def update(id):
     
           # [TO-DO]: Add real creation logic here (e.g. save to database record)
                 # Use the database function to update the product
-        update_product(id, product_name, product_price, product_category,  product_brand, product_description, product_image, product_gallery1, product_gallery2, product_gallery3)
+        update_product(id, product_name, product_price, product_category,  product_condition, product_description, product_image, product_gallery1, product_gallery2, product_gallery3)
         
 
         #update_product(id, updated_fields)
@@ -615,14 +602,64 @@ def logout():
     flash(category='info', message='You have been logged out.')
     return redirect(url_for('index'))
 
+# AI Session using panda and nymph
+#=========================================================
+# AI functionality below.
 
 
+# AI: live category suggestion while typing a listing
+@app.route('/api/suggest_category', methods=['POST'])
+def api_suggest_category():
+    data = request.get_json()
+    text = f"{data.get('product_name', '')} {data.get('product_description', '')}"
+    result = suggest_category(text)
+    return {"result": result}
 
 
+# AI: live price suggestion while typing a listing
+@app.route('/api/suggest_price', methods=['POST'])
+def api_suggest_price():
+    data = request.get_json()
+    text = f"{data.get('product_name', '')} {data.get('product_description', '')}"
+    price = suggest_price(text, data.get('product_category'), data.get('product_condition'))
+    return {"price": price}
 
+# AI: for search suggestion based on your feeling
+@app.route('/search_product/')
+def search_product():
 
+    query = request.args.get('q', '').strip()
+    products = []
 
+    if query:
+        keyword_rows = search_products(query)
+        keyword_ids = {row['id'] for row in keyword_rows}
 
+        keyword_results = []
+        for row in keyword_rows:
+            product = dict(row)
+            product['match_type'] = 'exact'
+            keyword_results.append(product)
+
+        semantic_ids = semantic_search(query, top_n=10)
+        semantic_only_ids = [pid for pid in semantic_ids if pid not in keyword_ids]
+
+        semantic_results = []
+        for pid in semantic_only_ids:
+            row = get_product_by_id(pid)
+            if row:
+                product = dict(row)
+                product['match_type'] = 'ai'
+                semantic_results.append(product)
+
+        products = keyword_results + semantic_results
+
+    return render_template(
+        'search_product.html',
+        title=f"Search results for '{query}'" if query else "Search",
+        products=products,
+        query=query
+    )
 
 
 # Run application
