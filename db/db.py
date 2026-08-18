@@ -18,7 +18,15 @@ __all__ = [
     "delete_product",
     "get_categories_with_count",
     "get_products_by_category",
-    "search_products"
+    "search_products",
+    "search_users_by_username_prefix",
+    "create_transaction",
+    "get_transactions_by_product",
+    "get_unreviewed_transaction",
+    "create_review",
+    "get_reviews_by_product",
+    "get_reviews_by_product",
+    "get_vendor_trust_score"
    
 ]
 
@@ -208,6 +216,134 @@ def search_products(keyword):
     """, (f"%{keyword}%",)).fetchall()
     conn.close()
     return products
+
+# Reviews & Transactions functions
+# =========================================================
+
+# Live username search for the "Confirm Sale" buyer picker
+def search_users_by_username_prefix(prefix, exclude_user_id=None, limit=8):
+    conn = get_db_connection()
+    if exclude_user_id:
+        rows = conn.execute(
+            "SELECT id, username FROM users WHERE username LIKE ? AND id != ? ORDER BY username LIMIT ?",
+            (f"{prefix}%", exclude_user_id, limit)
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            "SELECT id, username FROM users WHERE username LIKE ? ORDER BY username LIMIT ?",
+            (f"{prefix}%", limit)
+        ).fetchall()
+    conn.close()
+    return rows
+
+
+# Vendor confirms a sale to a specific buyer for a specific product
+def create_transaction(vendor_id, buyer_id, product_id):
+    conn = get_db_connection()
+    try:
+        conn.execute(
+            "INSERT INTO transactions (vendor_id, buyer_id, product_id) VALUES (?, ?, ?)",
+            (vendor_id, buyer_id, product_id)
+        )
+        conn.commit()
+        return True
+    except sqlite3.IntegrityError:
+        return False  # this buyer was already confirmed for this product
+    finally:
+        conn.close()
+
+
+# All confirmed buyers for a product - vendor-only display ("Sold to: ...")
+def get_transactions_by_product(product_id):
+    conn = get_db_connection()
+    rows = conn.execute(
+        """SELECT transactions.*, users.username AS buyer_username
+           FROM transactions JOIN users ON transactions.buyer_id = users.id
+           WHERE product_id = ?
+           ORDER BY transactions.created DESC""",
+        (product_id,)
+    ).fetchall()
+    conn.close()
+    return rows
+
+
+# Checks if this user has a confirmed, not-yet-reviewed purchase of this
+# product - determines whether the "Leave a Review" option should show
+def get_unreviewed_transaction(buyer_id, product_id):
+    conn = get_db_connection()
+    row = conn.execute(
+        """SELECT transactions.* FROM transactions
+           LEFT JOIN reviews ON reviews.transaction_id = transactions.id
+           WHERE transactions.buyer_id = ? AND transactions.product_id = ?
+           AND reviews.id IS NULL
+           LIMIT 1""",
+        (buyer_id, product_id)
+    ).fetchone()
+    conn.close()
+    return row
+
+
+def create_review(transaction_id, reviewer_id, vendor_id, product_id, rating, review_text, sentiment_label, sentiment_score):
+    conn = get_db_connection()
+    conn.execute(
+        """INSERT INTO reviews
+           (transaction_id, reviewer_id, vendor_id, product_id, rating, review_text, sentiment_label, sentiment_score)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+        (transaction_id, reviewer_id, vendor_id, product_id, rating, review_text, sentiment_label, sentiment_score)
+    )
+    conn.commit()
+    conn.close()
+
+
+# Public - visible to everyone, registered or not
+def get_reviews_by_product(product_id):
+    conn = get_db_connection()
+    rows = conn.execute(
+        """SELECT reviews.*, users.username AS reviewer_username
+           FROM reviews JOIN users ON reviews.reviewer_id = users.id
+           WHERE reviews.product_id = ?
+           ORDER BY reviews.created DESC""",
+        (product_id,)
+    ).fetchall()
+    conn.close()
+    return rows
+
+# Aggregates a vendor's reviews into a trust score summary.
+# Pure aggregation of data already stored - no new AI model runs here,
+# it just summarises sentiment/rating values VADER already produced
+# per review at submission time.
+def get_vendor_trust_score(vendor_id):
+    conn = get_db_connection()
+
+    rows = conn.execute(
+        "SELECT rating, sentiment_label FROM reviews WHERE vendor_id = ?",
+        (vendor_id,)
+    ).fetchall()
+    conn.close()
+
+    total = len(rows)
+    if total == 0:
+        return {
+            "total_reviews": 0,
+            "average_rating": None,
+            "positive_pct": 0,
+            "neutral_pct": 0,
+            "negative_pct": 0,
+        }
+
+    avg_rating = sum(r['rating'] for r in rows) / total
+
+    positive_count = sum(1 for r in rows if r['sentiment_label'] == 'Positive')
+    neutral_count = sum(1 for r in rows if r['sentiment_label'] == 'Neutral')
+    negative_count = sum(1 for r in rows if r['sentiment_label'] == 'Negative')
+
+    return {
+        "total_reviews": total,
+        "average_rating": round(avg_rating, 1),
+        "positive_pct": round((positive_count / total) * 100),
+        "neutral_pct": round((neutral_count / total) * 100),
+        "negative_pct": round((negative_count / total) * 100),
+    }
 
 
 

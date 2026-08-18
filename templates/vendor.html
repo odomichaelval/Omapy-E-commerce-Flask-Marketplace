@@ -43,7 +43,36 @@
                         <p class="mb-4"><b>City: </b>{{ vendor['city'] }} </p>
                         <p class="mb-4"><b>Post Code: </b>{{ vendor['postcode'] }} </p>
 
-
+                      <h5 class="mb-3">Vendor Trust Score</h5>
+{% if trust_score.total_reviews > 0 %}
+<div class="p-3 bg-light rounded mb-4" style="max-width: 400px;">
+    <div class="d-flex align-items-center mb-2">
+        <span class="text-warning fs-4 me-2">
+            {% for i in range(trust_score.average_rating | round(0, 'floor') | int) %}★{% endfor %}{% for i in range(5 - (trust_score.average_rating | round(0, 'floor') | int)) %}☆{% endfor %}
+        </span>
+        <span class="fw-bold">{{ trust_score.average_rating }} / 5</span>
+        <span class="text-muted ms-2">({{ trust_score.total_reviews }} review{{ 's' if trust_score.total_reviews != 1 else '' }})</span>
+    </div>
+            <div class="d-flex" style="height: 10px; border-radius: 5px; overflow: hidden;">
+                {% if trust_score.positive_pct > 0 %}
+                <div style="width: {{ trust_score.positive_pct }}%; background-color: #28a745;" title="{{ trust_score.positive_pct }}% Positive"></div>
+                {% endif %}
+                {% if trust_score.neutral_pct > 0 %}
+                <div style="width: {{ trust_score.neutral_pct }}%; background-color: #6c757d;" title="{{ trust_score.neutral_pct }}% Neutral"></div>
+                {% endif %}
+                {% if trust_score.negative_pct > 0 %}
+                <div style="width: {{ trust_score.negative_pct }}%; background-color: #dc3545;" title="{{ trust_score.negative_pct }}% Negative"></div>
+                {% endif %}
+            </div>
+            <div class="mt-2" style="font-size: 0.85rem;">
+                <span class="text-success me-3">● Positive {{ trust_score.positive_pct }}%</span>
+                <span class="text-neutral-trust me-3">● Neutral {{ trust_score.neutral_pct }}%</span>
+                <span class="text-danger">● Negative {{ trust_score.negative_pct }}%</span>
+            </div>
+        </div>
+        {% else %}
+        <p class="text-muted mb-4">No reviews yet for this vendor.</p>
+        {% endif %}
 
 
 

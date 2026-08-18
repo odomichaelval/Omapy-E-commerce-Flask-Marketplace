@@ -24,6 +24,8 @@
 
                     {% if query %}
                     <p class="text-muted">Showing results for "<strong>{{ query }}</strong>"</p>
+                    {% elif is_visual %}
+                    <p class="text-muted">Showing products that visually match your uploaded photo</p>
                     {% endif %}
                 </div>
                 <div class="col-lg-8 text-end wow fadeInRight" data-wow-delay="0.1s">

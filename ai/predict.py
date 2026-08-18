@@ -12,6 +12,9 @@ from ai.data_export import get_products_dataframe
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
+from PIL import Image
+from io import BytesIO
+
 
 MODELS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models")
 
@@ -22,6 +25,8 @@ _cluster_vectorizer = joblib.load(os.path.join(MODELS_DIR, "cluster_vectorizer.j
 _cluster_model = joblib.load(os.path.join(MODELS_DIR, "cluster_model.joblib"))
 _semantic_model = SentenceTransformer("all-MiniLM-L6-v2")
 _semantic_data = joblib.load(os.path.join(MODELS_DIR, "semantic_embeddings.joblib"))
+_visual_model = SentenceTransformer("clip-ViT-B-32")
+_visual_data = joblib.load(os.path.join(MODELS_DIR, "visual_embeddings.joblib"))
 
 MIN_TEXT_LENGTH = 8  # below this, suggestions are too unreliable to show
 
@@ -150,8 +155,6 @@ def get_similar_products(product_id, current_category, category_limit=5, cluster
 # 4. SEMANTIC SEARCH and NLP
 # ============================================================
 
-
-
 SEMANTIC_SIMILARITY_THRESHOLD = 0.35  # tune by testing - see note below
 
 
@@ -172,3 +175,25 @@ def semantic_search(query, top_n=10):
     matches = [(pid, score) for pid, score in ranked if score >= SEMANTIC_SIMILARITY_THRESHOLD]
 
     return [pid for pid, score in matches[:top_n]]
+
+# ============================================================
+# 5. IMAGE SEARCH, Deep Learning/visual search
+# ============================================================
+
+
+def search_by_image(image_bytes, limit=10):
+    """
+    The advanced feature: upload any photo, find listings that visually
+    resemble it. Encodes the uploaded image with the SAME CLIP model used
+    to index every product photo, then ranks by cosine similarity.
+    """
+    try:
+        img = Image.open(BytesIO(image_bytes)).convert("RGB")
+    except Exception:
+        return []
+
+    query_embedding = _visual_model.encode([img])
+    similarities = cosine_similarity(query_embedding, _visual_data["embeddings"]).flatten()
+
+    ranked = sorted(zip(_visual_data["ids"], similarities), key=lambda x: x[1], reverse=True)
+    return [pid for pid, score in ranked[:limit]]

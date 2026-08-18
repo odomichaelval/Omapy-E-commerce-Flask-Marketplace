@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6">Confirm Sale</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('product', id=product['id']) }}">{{ product['product_name'] }}</a></li>
+        <li class="breadcrumb-item active text-white">Confirm Sale</li>
+    </ol>
+</div>
+
+<div class="container-fluid contact py-5">
+    <div class="container py-5">
+        <div class="p-5 bg-light rounded">
+            <h4 class="mb-4">Confirm sale of "{{ product['product_name'] }}"</h4>
+
+            {% for category, message in get_flashed_messages(with_categories=True) %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+
+            <form method="post" id="confirm-sale-form" autocomplete="off">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input type="hidden" name="buyer_id" id="buyer_id">
+
+                <div class="mb-3 position-relative">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="buyer_search" placeholder="Search buyer username">
+                        <label for="buyer_search">Search buyer username (min 3 letters)</label>
+                    </div>
+                    <div id="buyer_results" class="list-group position-absolute w-100" style="z-index: 10;"></div>
+                </div>
+
+                <div id="selected_buyer" class="mb-3 fw-bold text-primary"></div>
+
+                <button type="submit" class="btn btn-primary py-2 px-4" id="confirm-submit-btn" disabled>Confirm Sale</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/buyer_search.js') }}"></script>
+{% endblock %}

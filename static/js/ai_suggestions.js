@@ -50,17 +50,48 @@ document.addEventListener("DOMContentLoaded", function () {
     const alts = data.result.alternatives
       .map(
         (a) =>
-          `<button type="button" class="ai-suggest-btn btn-outline-secondary ai-apply-category me-1" data-value="${a.category}">${a.category} (${a.confidence}%)</button>`
+          `<button type="button" class="ai-suggest-btn ai-apply-category me-1" data-value="${a.category}">${a.category} (${a.confidence}%)</button>`
       )
       .join(" ");
 
-    categoryBox.innerHTML = `<small>AI suggests: ${alts}</small>`;
+    categoryBox.innerHTML = `<small>AI suggests: ${alts}
+      <button type="button" class="ai-suggest-btn" id="ai-why-category">Why?</button></small>
+      <div id="category-explanation" class="mt-2" style="display:none;"></div>`;
 
     categoryBox.querySelectorAll(".ai-apply-category").forEach((btn) => {
       btn.addEventListener("click", () => {
         categoryField.value = btn.dataset.value;
         fetchPriceSuggestion();
       });
+    });
+
+    document.getElementById("ai-why-category").addEventListener("click", async () => {
+      const explainBox = document.getElementById("category-explanation");
+      if (explainBox.style.display === "block") {
+        explainBox.style.display = "none";
+        return;
+      }
+
+      const res = await fetch("/api/explain_category", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+        body: JSON.stringify({
+          product_name: nameField.value,
+          product_description: descField.value,
+        }),
+      });
+      const explainData = await res.json();
+      if (!explainData.result) return;
+
+      const words = explainData.result.top_words
+        .map((w) => `<span class="badge me-1" style="background-color:#F28B00;">${w.word}</span>`)
+        .join("");
+
+      explainBox.innerHTML = `<div class="p-2 bg-light rounded">
+          <small class="text-muted">Words that pointed to "${explainData.result.predicted_category}":</small><br>
+          ${words}
+        </div>`;
+      explainBox.style.display = "block";
     });
   }
 
@@ -88,10 +119,47 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     priceBox.innerHTML = `<small>AI suggests: £${data.price}
-      <button type="button" class="ai-suggest-btn" id="ai-apply-price">Apply</button></small>`;
+      <button type="button" class="ai-suggest-btn" id="ai-apply-price">Apply</button>
+      <button type="button" class="ai-suggest-btn" id="ai-why-price">Why?</button></small>
+      <div id="price-explanation" class="mt-2" style="display:none;"></div>`;
 
     document.getElementById("ai-apply-price").addEventListener("click", () => {
       priceField.value = data.price;
+    });
+
+    document.getElementById("ai-why-price").addEventListener("click", async () => {
+      const explainBox = document.getElementById("price-explanation");
+      if (explainBox.style.display === "block") {
+        explainBox.style.display = "none";
+        return;
+      }
+
+      const res = await fetch("/api/explain_price", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+        body: JSON.stringify({
+          product_name: nameField.value,
+          product_description: descField.value,
+          product_category: categoryField.value,
+          product_condition: conditionField.value,
+        }),
+      });
+      const explainData = await res.json();
+      if (!explainData.result) return;
+
+      const rows = explainData.result.breakdown
+        .map((item) => {
+          const sign = item.impact >= 0 ? "+" : "";
+          const color = item.impact >= 0 ? "#28a745" : "#dc3545";
+          return `<div style="font-size:0.85rem;"><span style="color:${color};">${sign}£${item.impact}</span> — ${item.factor}</div>`;
+        })
+        .join("");
+
+      explainBox.innerHTML = `<div class="p-2 bg-light rounded">
+          <small class="text-muted">Base average: £${explainData.result.base_price}</small>
+          ${rows}
+        </div>`;
+      explainBox.style.display = "block";
     });
   }
 

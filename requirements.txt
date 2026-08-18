@@ -5,3 +5,6 @@ pandas
 numpy
 joblib
 sentence-transformers
+vaderSentiment
+shap
+Pillow

@@ -23,7 +23,7 @@ def get_products_dataframe():
     df = pd.read_sql_query(
         """
         SELECT id, product_name, product_description, product_category,
-               product_condition, product_price
+               product_condition, product_price, product_image
         FROM products
         """,
         conn,

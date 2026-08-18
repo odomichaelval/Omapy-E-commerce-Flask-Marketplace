@@ -2,7 +2,9 @@
 from flask import Flask, render_template, url_for, request, flash, redirect, session
 from flask_wtf import CSRFProtect
 from flask_wtf.csrf import generate_csrf
-from ai.predict import suggest_category, suggest_price, get_similar_products, semantic_search
+from ai.predict import suggest_category, suggest_price, get_similar_products, semantic_search, search_by_image
+from ai.sentiment import analyze_sentiment
+from ai.explain import explain_price, explain_category
 
 
 from db.db import *
@@ -136,18 +138,26 @@ def userProducts(user_id):
 @app.route('/product/<int:id>/')
 def product(id):
 
-    # Get product data
     product_data = get_product_by_id(id)
 
     if not product_data:
          flash(category='warning', message='Requested product not found!')
          return redirect(url_for('/'))
-
-    # AI-powered related products (clustering-based, falls back to category)
+   # AI-powered related products (clustering-based, falls back to category)
     similar_ids = get_similar_products(id, product_data['product_category'])
     related_products = [get_product_by_id(pid) for pid in similar_ids]
 
-    return render_template('product.html', title=product_data['product_name'], product=product_data, related_products=related_products)
+    is_owner = session.get('user_id') == product_data['user']
+    sold_to = get_transactions_by_product(id) if (is_owner or is_admin()) else []
+
+    reviews = get_reviews_by_product(id)
+    can_review_transaction = None
+    if session.get('user_id'):
+        can_review_transaction = get_unreviewed_transaction(session['user_id'], id)
+
+    return render_template('product.html', title=product_data['product_name'], product=product_data,
+                            related_products=related_products, sold_to=sold_to,
+                            reviews=reviews, can_review_transaction=can_review_transaction)
    
         # If product not found, redirect to products list with a flash message
 
@@ -451,19 +461,19 @@ def delete(id):
 @app.route('/vendor/<int:user_id>')
 def vendor_profile(user_id):
 
-    # Restrict access if not logged in
     if 'user_id' not in session:
         flash('You must be registered to message vendor.', 'warning')
         return redirect(url_for('register'))
 
-    # Fetch vendor by ID
     vendor_data = get_user_by_id(user_id)
 
     if not vendor_data:
         flash('Requested vendor not found!', 'warning')
         return redirect(url_for('index'))
 
-    return render_template( 'vendor.html',  title=vendor_data['username'], vendor=vendor_data )
+    trust_score = get_vendor_trust_score(user_id)
+
+    return render_template('vendor.html', title=vendor_data['username'], vendor=vendor_data, trust_score=trust_score)
 
 
 
@@ -661,7 +671,134 @@ def search_product():
         query=query
     )
 
+#This is for review feature featuring semtiment  analysis
+@app.route('/confirm_sale/<int:product_id>/', methods=['GET', 'POST'])
+def confirm_sale(product_id):
+    product = get_product_by_id(product_id)
+    if not product:
+        flash(category='warning', message='Product not found!')
+        return redirect(url_for('products'))
 
+    if product['user'] != session.get('user_id') and not is_admin():
+        flash(category='danger', message='You do not have permission to confirm a sale for this product.')
+        return redirect(url_for('product', id=product_id))
+
+    if request.method == 'POST':
+        buyer_id = request.form.get('buyer_id')
+        if not buyer_id:
+            flash(category='danger', message='Please select a buyer.')
+            return redirect(url_for('confirm_sale', product_id=product_id))
+
+        buyer = get_user_by_id(buyer_id)
+        if not buyer:
+            flash(category='danger', message='Selected buyer not found.')
+            return redirect(url_for('confirm_sale', product_id=product_id))
+
+        success = create_transaction(product['user'], int(buyer_id), product_id)
+        if success:
+            flash(category='success', message=f"Sale confirmed: {buyer['username']} for {product['product_name']}.")
+        else:
+            flash(category='info', message=f"{buyer['username']} was already confirmed for this product.")
+        return redirect(url_for('product', id=product_id))
+
+    return render_template('confirm_sale.html', title="Confirm Sale", product=product)
+
+
+@app.route('/api/search_buyers')
+def api_search_buyers():
+    prefix = request.args.get('q', '').strip()
+    if len(prefix) < 3:
+        return {"results": []}
+    vendor_id = session.get('user_id')
+    matches = search_users_by_username_prefix(prefix, exclude_user_id=vendor_id)
+    return {"results": [{"id": row['id'], "username": row['username']} for row in matches]}
+
+
+#review submission route
+@app.route('/review/<int:product_id>/', methods=['POST'])
+def submit_review(product_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        flash(category='warning', message='You must be logged in to leave a review.')
+        return redirect(url_for('login'))
+
+    product = get_product_by_id(product_id)
+    if not product:
+        flash(category='warning', message='Product not found.')
+        return redirect(url_for('shop'))
+
+    transaction = get_unreviewed_transaction(user_id, product_id)
+    if not transaction:
+        flash(category='danger', message='You can only review products from a confirmed purchase.')
+        return redirect(url_for('product', id=product_id))
+
+    rating = request.form.get('rating')
+    review_text = request.form.get('review_text', '').strip()
+
+    if not rating or not review_text:
+        flash(category='danger', message='Please provide both a rating and a review.')
+        return redirect(url_for('product', id=product_id))
+
+    sentiment_label, sentiment_score = analyze_sentiment(review_text)
+
+    create_review(
+        transaction_id=transaction['id'],
+        reviewer_id=user_id,
+        vendor_id=product['user'],
+        product_id=product_id,
+        rating=int(rating),
+        review_text=review_text,
+        sentiment_label=sentiment_label,
+        sentiment_score=sentiment_score,
+    )
+
+    flash(category='success', message='Thank you for your review!')
+    return redirect(url_for('product', id=product_id))
+
+
+# AI feature: Explain price  & category prediction using shapley values and model interpretability
+#=========================================================
+
+# AI feature: Explain price
+@app.route('/api/explain_price', methods=['POST'])
+def api_explain_price():
+    data = request.get_json()
+    text = f"{data.get('product_name', '')} {data.get('product_description', '')}"
+    result = explain_price(text, data.get('product_category'), data.get('product_condition'))
+    return {"result": result}
+
+# AI feature: Explain Category
+
+@app.route('/api/explain_category', methods=['POST'])
+def api_explain_category():
+    data = request.get_json()
+    text = f"{data.get('product_name', '')} {data.get('product_description', '')}"
+    result = explain_category(text)
+    return {"result": result}
+
+@app.route('/visual_search/', methods=['POST'])
+def visual_search():
+    uploaded_file = request.files.get('search_image')
+
+    if not uploaded_file or not uploaded_file.filename:
+        flash(category='warning', message='Please choose an image to search with.')
+        return redirect(url_for('index'))
+
+    image_bytes = uploaded_file.read()
+    result_ids = search_by_image(image_bytes)
+
+    products = []
+    for pid in result_ids:
+        row = get_product_by_id(pid)
+        if row:
+            products.append(dict(row))
+    return render_template(
+        'search_product.html',
+        title="Visual Matches",
+        products=products,
+        query=None,
+        is_visual=True
+    )    
 # Run application
 #=========================================================
 # This code executes when the script is run directly.

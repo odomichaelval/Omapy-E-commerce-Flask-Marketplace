@@ -65,39 +65,60 @@
 
                         <p class="mb-4">{{ product['product_description'] }}</p>
 
-                        {% if session['user_id'] == product['user'] or is_admin() %}
+                       {% if session['user_id'] == product['user'] or is_admin() %}
 
-                        <div class="mb-3">
-                            <form method="post" action="{{ url_for('delete', id=product['id']) }}"
-                                onsubmit="return confirm('Are you sure you want to delete this product?');">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                                <a href="{{ url_for('update', id=product['id']) }}">
-                                    <div class="btn btn-primary d-inline-block rounded text-white py-1 px-4 me-2"><i
-                                            class="fas fa-edit me-1"></i> Update</div>
-                                </a>
-                                <button type="submit"
-                                    class="btn btn-secondary d-inline-block rounded text-white py-1 px-4 ms-2"><i
-                                        class="fas fa-trash me-1"></i> Delete</button>
+                <div class="mb-3">
+                    <form method="post" action="{{ url_for('delete', id=product['id']) }}"
+                        onsubmit="return confirm('Are you sure you want to delete this product?');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <a href="{{ url_for('update', id=product['id']) }}">
+                            <div class="btn btn-primary d-inline-block rounded text-white py-1 px-4 me-2"><i
+                                    class="fas fa-edit me-1"></i> Update</div>
+                        </a>
+                        <button type="submit"
+                            class="btn btn-secondary d-inline-block rounded text-white py-1 px-4 ms-2"><i
+                                class="fas fa-trash me-1"></i> Delete</button>
 
-                            </form>
-                        </div>
-                        {% endif %}
+                    </form>
+                </div>
 
-                        {% if session['user_id'] %}
-                        <div class="mb-3">
+                {% endif %}
 
-                            <a href="{{ url_for('create') }}">
-                                <div class="btn btn-primary d-inline-block rounded text-white py-1 px-4 me-2"><i
-                                        class="fas fa-plus me-1"></i> Add</div>
-                            </a>
+                {% if session['user_id'] %}
+                <div class="mb-3">
 
-                            <a href="{{ url_for('products') }}">
-                                <div class="btn btn-primary d-inline-block rounded text-white py-1 px-4 me-2"><i
-                                        class="fas fa-arrow-left me-1"></i> Your products</div>
-                            </a>
+                    <a href="{{ url_for('create') }}">
+                        <div class="btn btn-primary d-inline-block rounded text-white py-1 px-4 me-2"><i
+                                class="fas fa-plus me-1"></i> Add</div>
+                    </a>
 
-                        </div>
-                        {% endif %}
+                    <a href="{{ url_for('products') }}">
+                        <div class="btn btn-primary d-inline-block rounded text-white py-1 px-4 me-2"><i
+                                class="fas fa-arrow-left me-1"></i> Your products</div>
+                    </a>
+
+                </div>
+                {% endif %}
+
+                {% if session['user_id'] == product['user'] or is_admin() %}
+
+                <div class="mb-3">
+                    <a href="{{ url_for('confirm_sale', product_id=product['id']) }}">
+                        <div class="btn btn-primary d-inline-block rounded text-white py-1 px-4"><i
+                                class="fas fa-check-circle me-1"></i> Confirm Sale</div>
+                    </a>
+                </div>
+
+                {% if sold_to %}
+                <div class="mb-3">
+                    <small class="d-block text-muted">
+                        Sold to:
+                        {% for t in sold_to %}{{ t['buyer_username'] }}{% if not loop.last %}, {% endif %}{% endfor %}
+                    </small>
+                </div>
+                {% endif %}
+
+                {% endif %}
                         <br> <br>
 
                         <a href="{{ url_for('vendor_profile', user_id=product.user) }}"
@@ -112,6 +133,75 @@
     </div>
 </div>
 <!-- Single Products End -->
+
+<!-- Reviews Start -->
+<div class="container-fluid py-5">
+    <div class="container">
+
+        {% if can_review_transaction %}
+        <div class="p-4 bg-light rounded mb-5">
+            <h5 class="mb-3">Leave a Review</h5>
+            <form method="post" action="{{ url_for('submit_review', product_id=product['id']) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+                <div class="mb-3">
+                    <label class="form-label d-block">Rating</label>
+                    <select name="rating" class="form-select" style="max-width: 150px;" required>
+                        <option value="">Select</option>
+                        <option value="5">5 - Excellent</option>
+                        <option value="4">4 - Good</option>
+                        <option value="3">3 - Okay</option>
+                        <option value="2">2 - Poor</option>
+                        <option value="1">1 - Terrible</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Your review</label>
+                    <textarea name="review_text" class="form-control" rows="3" maxlength="500" required></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary py-2 px-4">Submit Review</button>
+            </form>
+        </div>
+        {% endif %}
+
+        <h4 class="text-primary mb-4 border-bottom border-primary border-2 d-inline-block p-2">
+            Reviews {% if reviews %}({{ reviews|length }}){% endif %}
+        </h4>
+
+        {% for review in reviews %}
+        <div class="border-bottom py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <strong>{{ review['reviewer_username'] }}</strong>
+                <span class="badge
+                    {% if review['sentiment_label'] == 'Positive' %}bg-success
+                    {% elif review['sentiment_label'] == 'Negative' %}bg-danger
+                    {% else %}badge-neutral{% endif %}">
+                    {{ review['sentiment_label'] }}
+                </span>
+            </div>
+            <div class="text-warning mb-2">
+                {% for i in range(review['rating']) %}★{% endfor %}{% for i in range(5 - review['rating']) %}☆{% endfor %}
+            </div>
+
+            {% if (review['rating'] >= 4 and review['sentiment_label'] == 'Negative') or (review['rating'] <= 2 and review['sentiment_label'] == 'Positive') %}
+            <div class="alert alert-warning py-2 px-3 mb-2" style="font-size: 0.85rem;">
+                <i class="fas fa-exclamation-triangle me-1"></i>
+                AI note: the star rating and the tone of this review don't fully agree — worth reading the words, not just the stars.
+            </div>
+            {% endif %}
+
+            <p class="mb-1">{{ review['review_text'] }}</p>
+            <small class="text-muted">{{ review['created'] }}</small>
+        </div>
+        {% else %}
+        <p class="text-muted">No reviews yet for this product.</p>
+        {% endfor %}
+
+    </div>
+</div>
+<!-- Reviews End -->
 
 <!-- Related Product Start -->
 <div class="container-fluid related-product">

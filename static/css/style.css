@@ -913,3 +913,13 @@
   background-color: #F28B00;
   color: #fff;
 }
+
+
+.badge-neutral {
+  background-color: #484848;
+  color: #ffffff;
+}
+
+.text-neutral-trust {
+  color: #484848;
+}

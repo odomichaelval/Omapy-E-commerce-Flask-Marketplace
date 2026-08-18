@@ -61,18 +61,29 @@
             </div>
             <div class="col-md-4 col-lg-6 text-center">
                 <div class="position-relative ps-4">
-                    <form method="get" action="{{ url_for('search_product') }}">
-                        <div class="d-flex border rounded-pill">
-                            <input class="form-control border-0 rounded-pill w-100 py-3" type="text" name="q"
-                                value="{{ request.args.get('q', '') }}" placeholder="Search Looking For?" required>
+    <form method="get" action="{{ url_for('search_product') }}">
+        <div class="d-flex border rounded-pill">
+            <input class="form-control border-0 rounded-pill w-100 py-3" type="text" name="q"
+                value="{{ request.args.get('q', '') }}" placeholder="Search Looking For?" required>
 
-                            <button type="submit" class="btn btn-primary rounded-pill py-3 px-5" style="border: 0;">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
-                    </form>
+            <button type="submit" class="btn btn-primary rounded-pill py-3 px-5" style="border: 0;">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </form>
 
-                </div>
+    <form method="post" action="{{ url_for('visual_search') }}" enctype="multipart/form-data" id="visual-search-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="file" name="search_image" id="visual-search-input" accept="image/*" class="d-none">
+        <button type="button" id="visual-search-trigger" class="btn btn-primary rounded-circle"
+            style="position: absolute; top: 50%; right: -55px; transform: translateY(-50%); width: 45px; height: 45px;"
+            title="Search by photo">
+            <i class="fas fa-camera"></i>
+        </button>
+    </form>
+</div>
+
+
             </div>
             <div class="col-md-4 col-lg-3 text-center text-lg-end">
                 <div class="d-inline-flex align-items-center">
@@ -303,6 +314,10 @@
 
     <!-- Tidio LiveChat Script -->
     <script src="//code.tidio.co/h4ppk8yiloxsmns40xgjp08dtxtzmrrs.js" async></script>
+
+    <!-- Search bar Script -->
+
+    <script src="{{ url_for('static', filename='js/visual_search_trigger.js') }}"></script>
 </body>
 
 </html>
