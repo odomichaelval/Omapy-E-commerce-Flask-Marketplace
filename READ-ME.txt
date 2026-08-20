@@ -6,3 +6,6 @@
 •	Extract the uploads folder and  drop the folder “uploads” inside the static folder.
 •	Run python -m ai.retrain_all  this trains/refreshes the classifier, regressor, clusterer, and rebuilds the semantic and visual search indexes (the visual index step is the slowest, taking roughly 1–2 minutes on the current catalogue).
 •	Start the application: flask run (or python app.py), then open http://127.0.0.1:5000 in a browser.
+I implemented explainable AI to improve the transparency and interpretability of the machine learning model. Rather than presenting predictions as black-box outputs, XAI techniques help identify the features that contributed to the model's decision, allowing users to understand and evaluate the reasoning behind the prediction.
+I also implemented Natural Language Processing (NLP) to enhance the product search functionality. The system processes users’ natural language search queries and uses semantic understanding to identify products that are relevant to the user’s search intent, rather than relying solely on exact keyword matching. This improves the ability of customers to discover relevant products even when their search terms differ from the wording used in product descriptions.
+And finally, i implemented Prompt Engineering as a live chat, calling an external API (Tidio) to implement this function.
