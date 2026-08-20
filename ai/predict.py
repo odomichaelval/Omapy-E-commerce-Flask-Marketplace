@@ -32,6 +32,7 @@ MIN_TEXT_LENGTH = 8  # below this, suggestions are too unreliable to show
 
 # ============================================================
 # 1. CATEGORY CLASSIFIER
+
 # ============================================================
 def suggest_category(text):
     """
@@ -81,6 +82,7 @@ def suggest_price(text, category, condition):
 
 # ============================================================
 # 3. PRODUCT CLUSTERER (for smarter "related products")
+# Finshed Clsutering Implementation
 # ============================================================
 
 
