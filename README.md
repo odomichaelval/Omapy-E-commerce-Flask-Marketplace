@@ -1,27 +1,4 @@
-# Salone - Free Bootstrap 5 Business Template 
+Omapy is a Flask-built peer-to-peer marketplace e-commerce platform for students, and positioned as a shopping destination for students in England. Unlike a conventional single-seller store, Omapy allows any registered user to become a vendor and list new or used items for sale; buyers browse listings and message vendors directly rather than using a cart-and-checkout flow, making the platform closer to a classifieds/marketplace model (in the style of Facebook Marketplace) than a traditional online shop.
+The site's core structure includes a home page with featured products, a full shop listing, category pages (Accessories, Clothing, Electronics, Fashion, Furniture, Gadgets, Laptops, Smartphones, Sports and Stationery), individual product pages with images, price, condition and vendor details, vendor profile/messaging pages, and a registration flow that collects identity details including a selfie photo, phone/WhatsApp numbers and a home address — an identity-verification approach that goes beyond a typical student-project signup
 
-- [Demo](https://themewagon.github.io/Electro-Bootstrap/)
-
-#### Download
-
-- [Download from ThemeWagon](https://themewagon.com/themes/electro-bootstrap/)
-
-## Getting Started
-
-Clone Repository
-
-```
-https://github.com/themewagon/Electro-Bootstrap.git
-```
-
-## Author
-
-```
-Salone is developed by Team HTML Codex.
-```
-
-## License
-
-- Design and Code is Copyright &copy; [HTML Codex](https://htmlcodex.com/).
-- Licensed cover under [MIT]
-- Distributed by [ThemeWagon](https://themewagon.com)
+A user can browse products across 10 categories, create a listing and see the AI suggest a category and a fair price, search using everyday language or a photo, message a vendor and see a trust score based on past feedback, and chat with the AI shopping assistant to find items in plain English.
