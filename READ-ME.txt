@@ -3,6 +3,6 @@
 •	Clone the repository: https://github.com/odomichaelval/Omapy-E-commerce-Flask-Marketplace/   (git clone)
 •	Create and activate a virtual environment, then install dependencies: pip install -r requirements.txt
 •	After that, click the link to download the product images: https://drive.google.com/file/d/1vxoB393PKZ4IIuu_54J7A98Y5lIOX6tF/
-•	Extract the uploads folder and go and drop the folder “uploads” inside the static folder.
+•	Extract the uploads folder and  drop the folder “uploads” inside the static folder.
 •	Run python -m ai.retrain_all  this trains/refreshes the classifier, regressor, clusterer, and rebuilds the semantic and visual search indexes (the visual index step is the slowest, taking roughly 1–2 minutes on the current catalogue).
 •	Start the application: flask run (or python app.py), then open http://127.0.0.1:5000 in a browser.
