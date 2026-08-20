@@ -63,7 +63,7 @@ def train_classifier(df):
     print(classification_report(y_test, y_pred, zero_division=0))
 
     # Refit on ALL data before saving - in a small-data project every
-    # row matters for the deployed model. Note this means the accuracy
+    # row matters for the deployed model. Note that this means the accuracy
     # printed above is only indicative of the final saved model, not an
     # exact measurement of it - worth stating explicitly in your report.
     pipeline.fit(X, y)
