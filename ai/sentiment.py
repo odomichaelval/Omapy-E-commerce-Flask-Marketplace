@@ -4,7 +4,8 @@ and sEntiment Reasoner) - a pretrained, rule-based sentiment analyzer
 built specifically for short, informal text like reviews. No training
 required - unlike the classifier/regressor, this ships ready to use.
 """
-
+#completed the Sentiment Analysis Implementation
+#see code below for the implementation of the Sentiment Analysis using VADER
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 _analyzer = SentimentIntensityAnalyzer()
