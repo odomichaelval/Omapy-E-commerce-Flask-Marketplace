@@ -12,6 +12,7 @@ Run once (and again whenever product images change significantly):
 """
 
 #Completed the Visual Search Implementation
+#Neural Network and Deep Learning Completed see code implentation below
 
 import os
 import joblib
