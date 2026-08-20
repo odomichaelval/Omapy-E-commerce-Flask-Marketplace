@@ -11,6 +11,8 @@ Run once (and again whenever product images change significantly):
     python -m ai.build_visual_index
 """
 
+#Completed the Visual Search Implementation
+
 import os
 import joblib
 from PIL import Image
